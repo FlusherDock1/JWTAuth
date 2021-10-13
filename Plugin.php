@@ -1,6 +1,6 @@
 <?php namespace ReaZzon\JWTAuth;
 
-use Backend, Event;
+use Backend, Event, Config;
 use System\Classes\PluginBase;
 
 use Illuminate\Auth\Access\Gate;
@@ -53,6 +53,24 @@ class Plugin extends PluginBase
      * @return array
      */
     public function boot()
+    {
+        $this->registerConfigs();
+        $this->addEventListeners();
+    }
+
+    private function registerConfigs()
+    {
+        $pluginNamespace = str_replace('\\', '.', strtolower(__NAMESPACE__));
+        $packages = Config::get($pluginNamespace . '::packages');
+
+        foreach ($packages as $name => $options) {
+            if (!empty($options['config']) && !empty($options['config_namespace'])) {
+                Config::set($options['config_namespace'], $options['config']);
+            }
+        }
+    }
+
+    private function addEventListeners()
     {
         Event::subscribe(UserModelHandler::class);
     }
