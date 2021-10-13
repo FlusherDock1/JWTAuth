@@ -1,4 +1,4 @@
-<?php namespace ReaZzon\JWTAuth\JWT;
+<?php namespace ReaZzon\JWTAuth\Classes\Behaviors;
 
 use October\Rain\Database\ModelBehavior;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -6,7 +6,7 @@ use Lovata\Buddies\Models\User;
 
 /**
  * Class JWTUserSubjectBehavior
- * @package ReaZzon\JWTAuth\Behaviors
+ * @package ReaZzon\JWTAuth\Classes\Behaviors
  */
 class JWTUserSubjectBehavior extends ModelBehavior implements JWTSubject
 {

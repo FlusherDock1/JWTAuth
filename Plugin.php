@@ -3,14 +3,15 @@
 use Backend;
 use System\Classes\PluginBase;
 
-use Illuminate\Foundation\AliasLoader;
-use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Auth\Access\Gate;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
-use ReaZzon\JWTAuth\JWT\JWTUserSubjectBehavior;
-use ReaZzon\JWTAuth\JWT\JWTGuard;
-use ReaZzon\JWTAuth\JWT\JWTUserProvider;
+use ReaZzon\JWTAuth\Classes\Guards\JWTGuard;
+use ReaZzon\JWTAuth\Classes\Providers\UserProvider;
+use ReaZzon\JWTAuth\Classes\Behaviors\UserSubjectBehavior;
+
 use Lovata\Buddies\Models\User;
 
 use Tymon\JWTAuth\Providers\LaravelServiceProvider;
@@ -63,7 +64,6 @@ class Plugin extends PluginBase
     {
         $alias = AliasLoader::getInstance();
         $alias->alias('Gate', \Illuminate\Support\Facades\Gate::class);
-        $alias->alias('auth', AuthHelper::class);
 
         $this->app->singleton(GateContract::class, static function ($app): Gate {
             return new Gate($app, static function () use ($app): ?User {

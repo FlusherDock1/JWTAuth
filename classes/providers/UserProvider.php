@@ -1,4 +1,4 @@
-<?php namespace ReaZzon\JWTAuth\JWT;
+<?php namespace ReaZzon\JWTAuth\Classes\Providers;
 
 use Model;
 use Illuminate\Support\Str;
@@ -8,7 +8,7 @@ use Lovata\Buddies\Facades\AuthHelper;
 
 /**
  * Class JWTUserProvider
- * @package ReaZzon\JWTAuth\Providers
+ * @package ReaZzon\JWTAuth\Classes\Providers
  */
 class JWTUserProvider implements UserProvider
 {

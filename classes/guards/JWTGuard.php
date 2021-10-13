@@ -1,13 +1,13 @@
-<?php namespace ReaZzon\JWTAuth\JWT;
+<?php namespace ReaZzon\JWTAuth\Classes\Guards;
 
-use ReaZzon\JWTAuth\JWT\JWTUserSubjectBehavior;
-use Lovata\Buddies\Models\User;
 use Tymon\JWTAuth\JWT;
 use Tymon\JWTAuth\JWTGuard as JWTGuardBase;
+use Lovata\Buddies\Models\User;
+use ReaZzon\JWTAuth\Classes\Behaviors\JWTUserSubjectBehavior;
 
 /**
  * Class JWTGuard
- * @package LeMaX10\JwtUser\Classes
+ * @package LeMaX10\JwtUser\Classes\Guards
  */
 class JWTGuard extends JWTGuardBase
 {
