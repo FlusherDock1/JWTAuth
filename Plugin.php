@@ -3,6 +3,18 @@
 use Backend;
 use System\Classes\PluginBase;
 
+use Illuminate\Foundation\AliasLoader;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Auth\Access\Gate;
+use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+
+use ReaZzon\JWTAuth\JWT\JWTUserSubjectBehavior;
+use ReaZzon\JWTAuth\JWT\JWTGuard;
+use ReaZzon\JWTAuth\JWT\JWTUserProvider;
+use Lovata\Buddies\Models\User;
+
+use Tymon\JWTAuth\Providers\LaravelServiceProvider;
+
 /**
  * JWTAuth Plugin Information File
  */
@@ -18,7 +30,7 @@ class Plugin extends PluginBase
         return [
             'name'        => 'JWTAuth',
             'description' => 'No description provided yet...',
-            'author'      => 'ReaZzon',
+            'author'      => 'ReaZzon, LeMaX10',
             'icon'        => 'icon-leaf'
         ];
     }
@@ -30,7 +42,8 @@ class Plugin extends PluginBase
      */
     public function register()
     {
-
+        $this->registerGates();
+        $this->registerJWT();
     }
 
     /**
@@ -44,53 +57,38 @@ class Plugin extends PluginBase
     }
 
     /**
-     * Registers any front-end components implemented in this plugin.
-     *
-     * @return array
+     * Регистрация менеджера авторизации.
      */
-    public function registerComponents()
+    private function registerGates(): void
     {
-        return []; // Remove this line to activate
+        $alias = AliasLoader::getInstance();
+        $alias->alias('Gate', \Illuminate\Support\Facades\Gate::class);
+        $alias->alias('auth', AuthHelper::class);
 
-        return [
-            'ReaZzon\JWTAuth\Components\MyComponent' => 'myComponent',
-        ];
+        $this->app->singleton(GateContract::class, static function ($app): Gate {
+            return new Gate($app, static function () use ($app): ?User {
+                return $app['user.auth']->user();
+            });
+        });
     }
 
     /**
-     * Registers any back-end permissions used by this plugin.
-     *
-     * @return array
+     * Регистрация JWT.
      */
-    public function registerPermissions()
+    private function registerJWT(): void
     {
-        return []; // Remove this line to activate
+        (new LaravelServiceProvider($this->app))->register();
 
-        return [
-            'reazzon.jwtauth.some_permission' => [
-                'tab' => 'JWTAuth',
-                'label' => 'Some permission'
-            ],
-        ];
-    }
+        $this->app->singleton('JWTGuard', static function ($app): Guard {
+            $guard = new JWTGuard(
+                $app['tymon.jwt'],
+                new JWTUserProvider(User::class),
+                $app['request']
+            );
 
-    /**
-     * Registers back-end navigation items for this plugin.
-     *
-     * @return array
-     */
-    public function registerNavigation()
-    {
-        return []; // Remove this line to activate
+            $app->refresh('request', $guard, 'setRequest');
 
-        return [
-            'jwtauth' => [
-                'label'       => 'JWTAuth',
-                'url'         => Backend::url('reazzon/jwtauth/mycontroller'),
-                'icon'        => 'icon-leaf',
-                'permissions' => ['reazzon.jwtauth.*'],
-                'order'       => 500,
-            ],
-        ];
+            return $guard;
+        });
     }
 }
