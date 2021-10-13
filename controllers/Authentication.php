@@ -32,6 +32,7 @@ class Authentication extends Controller
 
     public function register()
     {
+        \Db::table('lovata_buddies_users')->truncate();
         $arCredentials = $this->getCredentials();
 
         try {

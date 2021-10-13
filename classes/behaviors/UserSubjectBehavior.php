@@ -5,10 +5,10 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use Lovata\Buddies\Models\User;
 
 /**
- * Class JWTUserSubjectBehavior
+ * Class UserSubjectBehavior
  * @package ReaZzon\JWTAuth\Classes\Behaviors
  */
-class JWTUserSubjectBehavior extends ModelBehavior implements JWTSubject
+class UserSubjectBehavior extends ModelBehavior implements JWTSubject
 {
     /** @var User */
     protected $model;

@@ -3,14 +3,14 @@
 use Model;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Auth\UserProvider as BaseUserProvider;
 use Lovata\Buddies\Facades\AuthHelper;
 
 /**
- * Class JWTUserProvider
+ * Class UserProvider
  * @package ReaZzon\JWTAuth\Classes\Providers
  */
-class JWTUserProvider implements UserProvider
+class UserProvider implements BaseUserProvider
 {
     /**
      * The Eloquent user model.

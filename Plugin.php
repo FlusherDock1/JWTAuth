@@ -1,6 +1,6 @@
 <?php namespace ReaZzon\JWTAuth;
 
-use Backend;
+use Backend, Event;
 use System\Classes\PluginBase;
 
 use Illuminate\Auth\Access\Gate;
@@ -10,9 +10,9 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 use ReaZzon\JWTAuth\Classes\Guards\JWTGuard;
 use ReaZzon\JWTAuth\Classes\Providers\UserProvider;
-use ReaZzon\JWTAuth\Classes\Behaviors\UserSubjectBehavior;
 
 use Lovata\Buddies\Models\User;
+use ReaZzon\JWTAuth\Classes\Events\UserModelHandler;
 
 use Tymon\JWTAuth\Providers\LaravelServiceProvider;
 
@@ -54,7 +54,7 @@ class Plugin extends PluginBase
      */
     public function boot()
     {
-
+        Event::subscribe(UserModelHandler::class);
     }
 
     /**
@@ -82,7 +82,7 @@ class Plugin extends PluginBase
         $this->app->singleton('JWTGuard', static function ($app): Guard {
             $guard = new JWTGuard(
                 $app['tymon.jwt'],
-                new JWTUserProvider(User::class),
+                new UserProvider(User::class),
                 $app['request']
             );
 

@@ -3,7 +3,7 @@
 use Tymon\JWTAuth\JWT;
 use Tymon\JWTAuth\JWTGuard as JWTGuardBase;
 use Lovata\Buddies\Models\User;
-use ReaZzon\JWTAuth\Classes\Behaviors\JWTUserSubjectBehavior;
+use ReaZzon\JWTAuth\Classes\Behaviors\UserSubjectBehavior;
 
 /**
  * Class JWTGuard
@@ -39,9 +39,9 @@ class JWTGuard extends JWTGuardBase
      */
     private function validateMethodParam(User $user): void
     {
-        if (!$user->isClassExtendedWith(JWTUserSubjectBehavior::class)) {
+        if (!$user->isClassExtendedWith(UserSubjectBehavior::class)) {
             throw new \InvalidArgumentException(
-                sprintf('user param must extend %s', JWTUserSubjectBehavior::class)
+                sprintf('user param must extend %s', UserSubjectBehavior::class)
             );
         }
     }
