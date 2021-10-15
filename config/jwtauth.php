@@ -5,7 +5,7 @@ return [
         'Rainlab.User' => [
             'model' => 'RainLab\User\Models\User',
             'resolver' => \ReaZzon\JWTAuth\Classes\Resolvers\RainlabPlugin::class,
-            'providers' => 'user.auth',
+            'provider' => 'user.auth',
         ],
         'Lovata.Buddies' => [
             'model' => 'Lovata\Buddies\Models\User',
