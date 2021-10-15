@@ -1,26 +1,28 @@
 <?php namespace ReaZzon\JWTAuth\Classes\Guards;
 
-use Tymon\JWTAuth\JWT;
+use Illuminate\Contracts\Auth\Authenticatable;
+use October\Rain\Auth\Models\User;
+use ReaZzon\JWTAuth\Classes\Contracts\UserPluginResolver;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 use Tymon\JWTAuth\JWTGuard as JWTGuardBase;
-use Lovata\Buddies\Models\User;
 use ReaZzon\JWTAuth\Classes\Behaviors\UserSubjectBehavior;
 
 /**
  * Class JWTGuard
- * @package LeMaX10\JwtUser\Classes\Guards
+ * @package ReaZzon\JwtUser\Classes\Guards
  */
 class JWTGuard extends JWTGuardBase
 {
     /**
-     * @param  User  $user
+     * @param  JWTSubject  $user
      * @return string
      */
-    public function login($user)
+    public function login(JWTSubject $user)
     {
         $this->validateMethodParam($user);
 
-        $proxyUserImplementedClass = $user->getProxyJwtSubject();
-        $token = $this->jwt->fromSubject($proxyUserImplementedClass);
+        $userPluginResolver = app(UserPluginResolver::class);
+        $token = $this->jwt->fromSubject($userPluginResolver->resolveModel());
         $this->setToken($token)->setUser($user);
 
         return $token;
@@ -37,7 +39,7 @@ class JWTGuard extends JWTGuardBase
     /**
      * @param User $user
      */
-    private function validateMethodParam(User $user): void
+    private function validateMethodParam(Authenticatable $user): void
     {
         if (!$user->isClassExtendedWith(UserSubjectBehavior::class)) {
             throw new \InvalidArgumentException(

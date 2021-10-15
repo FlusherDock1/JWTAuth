@@ -1,7 +1,8 @@
 <?php namespace ReaZzon\JWTAuth\Classes\Events;
 
 use ReaZzon\JWTAuth\Classes\Behaviors\UserSubjectBehavior;
-use Lovata\Buddies\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
+use ReaZzon\JWTAuth\Classes\Contracts\UserPluginResolver;
 
 class UserModelHandler
 {
@@ -11,8 +12,9 @@ class UserModelHandler
      */
     public function subscribe($obEvent)
     {
-        User::extend(function (User $user) {
-            $user->implement[] = UserSubjectBehavior::class;
+        $model = app(UserPluginResolver::class)->getModel();
+        $model::extend(static function (Authenticatable $userModel) {
+            $userModel->implement[] = UserSubjectBehavior::class;
         });
     }
 }

@@ -1,10 +1,13 @@
-<?php namespace ReaZzon\JWTAuth\Classes\Providers;
+<?php
+declare(strict_types=1);
+
+namespace ReaZzon\JWTAuth\Classes\Providers;
 
 use Model;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider as BaseUserProvider;
-use Lovata\Buddies\Facades\AuthHelper;
+use ReaZzon\JWTAuth\Classes\Contracts\UserPluginResolver;
 
 /**
  * Class UserProvider
@@ -50,7 +53,11 @@ class UserProvider implements BaseUserProvider
 
         // если в токене найден верный ид, то авторизируем пользователя в системе
         if ($user) {
-            AuthHelper::login($user);
+            /** @var UserPluginResolver $userPluginResolver */
+            $userPluginResolver = app(UserPluginResolver::class);
+            $userPluginResolver
+                ->getProvider()
+                ->login($user);
         }
 
         return $user;
