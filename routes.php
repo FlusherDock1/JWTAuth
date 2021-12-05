@@ -1,9 +1,11 @@
 <?php
 
-Route::group(['prefix' => 'jwt'], function () {
+Route::group([
+        'prefix' => 'jwt',
+    ], static function () {
 
-    Route::post('login', [\ReaZzon\JWTAuth\Controllers\Authentication::class, 'login']);
-    Route::post('register', [\ReaZzon\JWTAuth\Controllers\Authentication::class, 'register']);
-    Route::post('refresh', [\ReaZzon\JWTAuth\Controllers\Authentication::class, 'refresh']);
-
+    Route::post('login', \ReaZzon\JWTAuth\Http\Controllers\AuthController::class);
+    Route::post('refresh', \ReaZzon\JWTAuth\Http\Controllers\RefreshController::class);
+    Route::post('register', \ReaZzon\JWTAuth\Http\Controllers\RegistrationController::class);
+    Route::post('activate', \ReaZzon\JWTAuth\Http\Controllers\ActivationController::class);
 });

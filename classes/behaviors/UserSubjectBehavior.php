@@ -1,8 +1,9 @@
-<?php namespace ReaZzon\JWTAuth\Classes\Behaviors;
+<?php
+declare(strict_types=1);
+namespace ReaZzon\JWTAuth\Classes\Behaviors;
 
 use October\Rain\Database\ModelBehavior;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Lovata\Buddies\Models\User;
 
 /**
  * Class UserSubjectBehavior
@@ -10,9 +11,6 @@ use Lovata\Buddies\Models\User;
  */
 class UserSubjectBehavior extends ModelBehavior implements JWTSubject
 {
-    /** @var User */
-    protected $model;
-
     /**
      * @return mixed
      */
@@ -27,27 +25,5 @@ class UserSubjectBehavior extends ModelBehavior implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
-    }
-
-    /**
-     * @return JWTSubject
-     */
-    public function getProxyJwtSubject(): JWTSubject
-    {
-        $proxyClass = new class extends User implements JWTSubject {
-            public $exists = true;
-
-            public function getJWTIdentifier()
-            {
-                return $this->extendableCall('getJWTIdentifier', []);
-            }
-
-            public function getJWTCustomClaims()
-            {
-                return $this->extendableCall('getJWTCustomClaims', []);
-            }
-        };
-
-        return (new $proxyClass())->setRawAttributes($this->model->toArray());
     }
 }

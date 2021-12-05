@@ -1,7 +1,12 @@
-<?php namespace ReaZzon\JWTAuth;
+<?php
+declare(strict_types=1);
 
-use Backend, Event, Config;
+namespace ReaZzon\JWTAuth;
+
+use Event, Config;
 use System\Classes\PluginBase;
+use ReaZzon\JWTAuth\Classes\UserPluginResolver;
+use ReaZzon\JWTAuth\Classes\Contracts\UserPluginResolver as UserPluginResolverContract;
 
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Contracts\Auth\Guard;
@@ -14,6 +19,7 @@ use ReaZzon\JWTAuth\Classes\Providers\UserProvider;
 use Lovata\Buddies\Models\User;
 use ReaZzon\JWTAuth\Classes\Events\UserModelHandler;
 
+use System\Classes\PluginManager;
 use Tymon\JWTAuth\Providers\LaravelServiceProvider;
 
 /**
@@ -30,7 +36,7 @@ class Plugin extends PluginBase
     {
         return [
             'name'        => 'JWTAuth',
-            'description' => 'No description provided yet...',
+            'description' => 'JWT authorization plugin',
             'author'      => 'ReaZzon, LeMaX10',
             'icon'        => 'icon-leaf'
         ];
@@ -43,6 +49,13 @@ class Plugin extends PluginBase
      */
     public function register()
     {
+        $this->checkRequiredPlugins();
+
+        $this->app->singleton(
+            UserPluginResolverContract::class,
+            static fn() => UserPluginResolver::instance()
+        );
+
         $this->registerGates();
         $this->registerJWT();
     }
@@ -50,7 +63,7 @@ class Plugin extends PluginBase
     /**
      * Boot method, called right before the request route.
      *
-     * @return array
+     * @return void
      */
     public function boot()
     {
@@ -58,6 +71,25 @@ class Plugin extends PluginBase
         $this->addEventListeners();
     }
 
+    protected function checkRequiredPlugins()
+    {
+        $plugins = ['RainLab.User', 'Lovata.Buddies'];
+        $pluginInstalled = false;
+
+        foreach ($plugins as $pluginName) {
+            if (PluginManager::instance()->hasPlugin($pluginName)) {
+                $pluginInstalled = true;
+            }
+        }
+
+        if (!$pluginInstalled) {
+            PluginManager::instance()->disablePlugin('ReaZzon.JWTAuth');
+        }
+    }
+
+    /**
+     *
+     */
     private function registerConfigs()
     {
         $pluginNamespace = str_replace('\\', '.', strtolower(__NAMESPACE__));
@@ -70,6 +102,9 @@ class Plugin extends PluginBase
         }
     }
 
+    /**
+     *
+     */
     private function addEventListeners()
     {
         Event::subscribe(UserModelHandler::class);
@@ -83,9 +118,9 @@ class Plugin extends PluginBase
         $alias = AliasLoader::getInstance();
         $alias->alias('Gate', \Illuminate\Support\Facades\Gate::class);
 
-        $this->app->singleton(GateContract::class, static function ($app): Gate {
-            return new Gate($app, static function () use ($app): ?User {
-                return $app['user.auth']->user();
+        $this->app->singleton(GateContract::class, function ($app): Gate {
+            return new Gate($app, function () use ($app): ?User {
+                return app(UserPluginResolverContract::class)->getProvider()->user();
             });
         });
     }
@@ -100,13 +135,28 @@ class Plugin extends PluginBase
         $this->app->singleton('JWTGuard', static function ($app): Guard {
             $guard = new JWTGuard(
                 $app['tymon.jwt'],
-                new UserProvider(User::class),
+                new UserProvider(app(UserPluginResolverContract::class)->getModel()),
                 $app['request']
             );
 
             $app->refresh('request', $guard, 'setRequest');
-
             return $guard;
         });
+    }
+
+    public function registerSettings(): array
+    {
+        return [
+            'settings' => [
+                'label'       => 'Buddies Settings',
+                'description' => 'Manage user based settings.',
+                'category'    => 'JWTAuth',
+                'icon'        => 'icon-cog',
+                'class'       => \ReaZzon\JWTAuth\Models\BuddiesSettings::class,
+                'order'       => 500,
+                'keywords'    => 'buddies users',
+                'permissions' => ['buddies-menu-*']
+            ]
+        ];
     }
 }

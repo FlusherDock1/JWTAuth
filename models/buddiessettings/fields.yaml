@@ -1,0 +1,10 @@
+fields:
+    activation_type:
+        label: Activation type
+        type: dropdown
+        span: left
+        default: off
+        options:
+            off: Force off
+            on: Force on
+            mail: Via mail

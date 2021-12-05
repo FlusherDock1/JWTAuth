@@ -1,6 +1,7 @@
-<?php namespace ReaZzon\JWTAuth\Classes\Middlewares;
+<?php
+declare(strict_types=1);
+namespace ReaZzon\JWTAuth\Http\Middlewares;
 
-use Kharanenka\Helper\Result;
 use ReaZzon\JWTAuth\Classes\Guards\JWTGuard;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\UserNotDefinedException;
@@ -9,7 +10,7 @@ use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 /**
  * Class ResolveUser
- * @package ReaZzon\JWTAuth\Classes\Middlewares
+ * @package ReaZzon\JWTAuth\Http\Middlewares
  */
 class ResolveUser
 {
