@@ -13,22 +13,30 @@ class RegistrationController extends Controller
 {
     /**
      * @param RegistrationRequest $registrationRequest
-     * @return TokenResource
+     * @throws \ApplicationException
+     * @return mixed
      */
-    public function __invoke(RegistrationRequest $registrationRequest): TokenResource
+    public function __invoke(RegistrationRequest $registrationRequest)
     {
-        $obUser = $this->userPluginResolver
+        $user = $this->userPluginResolver
             ->getProvider()
             ->register($registrationRequest->validated());
 
-        if ($obUser === null) {
-            //... error
+        if (empty($user)) {
+            throw new \ApplicationException('Registration failed');
+        }
+
+        if ($this->userPluginResolver->getResolver()->initActivation($user) !== 'on') {
+            return [
+                'message' => 'User created'
+            ];
         }
 
         request()->request->add([
-            'email'    => $obUser->email,
+            'email' => $user->email,
             'password' => $registrationRequest->password
         ]);
-        return app()->call('ReaZzon\JWTAuth\Http\Controllers\AuthController');
+
+        return app()->call(AuthController::class);
     }
 }

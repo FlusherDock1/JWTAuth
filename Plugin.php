@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace ReaZzon\JWTAuth;
 
 use Event, Config;
-use ReaZzon\JWTAuth\Classes\Contracts\UserPluginResolver as UserPluginResolverContract;
-use ReaZzon\JWTAuth\Classes\UserPluginResolver;
 use System\Classes\PluginBase;
+use ReaZzon\JWTAuth\Classes\UserPluginResolver;
+use ReaZzon\JWTAuth\Classes\Contracts\UserPluginResolver as UserPluginResolverContract;
 
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Contracts\Auth\Guard;
@@ -19,6 +19,7 @@ use ReaZzon\JWTAuth\Classes\Providers\UserProvider;
 use Lovata\Buddies\Models\User;
 use ReaZzon\JWTAuth\Classes\Events\UserModelHandler;
 
+use System\Classes\PluginManager;
 use Tymon\JWTAuth\Providers\LaravelServiceProvider;
 
 /**
@@ -48,6 +49,8 @@ class Plugin extends PluginBase
      */
     public function register()
     {
+        $this->checkRequiredPlugins();
+
         $this->app->singleton(
             UserPluginResolverContract::class,
             static fn() => UserPluginResolver::instance()
@@ -60,12 +63,28 @@ class Plugin extends PluginBase
     /**
      * Boot method, called right before the request route.
      *
-     * @return array
+     * @return void
      */
     public function boot()
     {
         $this->registerConfigs();
         $this->addEventListeners();
+    }
+
+    protected function checkRequiredPlugins()
+    {
+        $plugins = ['RainLab.User', 'Lovata.Buddies'];
+        $pluginInstalled = false;
+
+        foreach ($plugins as $pluginName) {
+            if (PluginManager::instance()->hasPlugin($pluginName)) {
+                $pluginInstalled = true;
+            }
+        }
+
+        if (!$pluginInstalled) {
+            PluginManager::instance()->disablePlugin('ReaZzon.JWTAuth');
+        }
     }
 
     /**
@@ -123,5 +142,21 @@ class Plugin extends PluginBase
             $app->refresh('request', $guard, 'setRequest');
             return $guard;
         });
+    }
+
+    public function registerSettings(): array
+    {
+        return [
+            'settings' => [
+                'label'       => 'Buddies Settings',
+                'description' => 'Manage user based settings.',
+                'category'    => 'JWTAuth',
+                'icon'        => 'icon-cog',
+                'class'       => \ReaZzon\JWTAuth\Models\BuddiesSettings::class,
+                'order'       => 500,
+                'keywords'    => 'buddies users',
+                'permissions' => ['buddies-menu-*']
+            ]
+        ];
     }
 }

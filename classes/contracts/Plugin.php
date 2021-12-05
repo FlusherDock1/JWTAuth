@@ -15,4 +15,8 @@ interface Plugin
      * @return JWTSubject
      */
     public function resolve(Model $model): JWTSubject;
+
+    public function initActivation($model): string;
+
+    public function activateByCode($code);
 }

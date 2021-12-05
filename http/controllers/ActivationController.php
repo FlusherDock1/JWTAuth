@@ -5,27 +5,26 @@ namespace ReaZzon\JWTAuth\Http\Controllers;
 
 use October\Rain\Argon\Argon;
 use ReaZzon\JWTAuth\Classes\Dto\TokenDto;
-use ReaZzon\JWTAuth\Http\Requests\LoginRequest;
-use ReaZzon\JWTAuth\Http\Resources\TokenResource;
+use ReaZzon\JWTAuth\Http\Requests\ActivationRequest;
 
 /**
  *
  */
-class AuthController extends Controller
+class ActivationController extends Controller
 {
     /**
-     * @param LoginRequest $loginRequest
-     * @return array
+     * @param ActivationRequest $registrationRequest
      * @throws \ApplicationException
+     * @return mixed
      */
-    public function __invoke(LoginRequest $loginRequest): array
+    public function __invoke(ActivationRequest $registrationRequest)
     {
         $user = $this->userPluginResolver
-            ->getProvider()
-            ->authenticate($loginRequest->validated());
+            ->getResolver()
+            ->activateByCode($registrationRequest->validated());
 
         if (empty($user)) {
-            throw new \ApplicationException('Login failed');
+            throw new \ApplicationException('Activation failed');
         }
 
         $tokenDto = new TokenDto([

@@ -51,7 +51,6 @@ class UserProvider implements BaseUserProvider
             ->where($model->getAuthIdentifierName(), $identifier)
             ->first();
 
-        // если в токене найден верный ид, то авторизируем пользователя в системе
         if ($user) {
             /** @var UserPluginResolver $userPluginResolver */
             $userPluginResolver = app(UserPluginResolver::class);

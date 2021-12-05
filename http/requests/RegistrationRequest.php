@@ -17,10 +17,11 @@ class RegistrationRequest extends FormRequest
         return [
             'name' => 'sometimes|string',
             'email' => 'sometimes|string',
-            'password' => 'sometimes|confirmation',
             'last_name' => 'sometimes|string',
             'middle_name' => 'sometimes|string',
             'phone' => 'sometimes|string',
+            'password' => 'sometimes|confirmed',
+            'password_confirmation' => 'required_with:password',
         ];
     }
 }

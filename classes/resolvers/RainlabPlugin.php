@@ -46,6 +46,21 @@ final class RainlabPlugin implements Plugin
             {
                 return $this->extendableCall('getJWTCustomClaims', []);
             }
+
+            public function afterRegistrationActivate()
+            {
+                return 'on';
+            }
         };
+    }
+
+    public function initActivation($model): string
+    {
+        // TODO: Implement initActivation() method.
+    }
+
+    public function activateByCode($code)
+    {
+        // TODO: Implement activateByCode() method.
     }
 }

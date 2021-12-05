@@ -3,6 +3,8 @@
     "type": "october-plugin",
     "description": "No description provided yet...",
     "require": {
+        "php": ">=7.4",
+        "ext-json": "*",
         "composer/installers": "~1.0",
         "tymon/jwt-auth": "1.0.2"
     },

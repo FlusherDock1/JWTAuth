@@ -6,7 +6,7 @@ namespace ReaZzon\JWTAuth\Http\Resources;
 /**
  * UserResource in response
  */
-class UserResource extends ExtandableResource
+class UserResource extends ExtendableResource
 {
 
 }

@@ -11,7 +11,7 @@ use October\Rain\Extension\ExtendableTrait;
 /**
  *
  */
-abstract class ExtandableResource extends JsonResource
+abstract class ExtendableResource extends JsonResource
 {
     use ExtendableTrait;
 
@@ -22,6 +22,7 @@ abstract class ExtandableResource extends JsonResource
 
     /**
      * Constructor
+     * @throws \Exception
      */
     public function __construct($resource)
     {

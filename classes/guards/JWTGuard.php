@@ -14,15 +14,15 @@ use ReaZzon\JWTAuth\Classes\Behaviors\UserSubjectBehavior;
 class JWTGuard extends JWTGuardBase
 {
     /**
-     * @param  JWTSubject  $user
+     * @param  Authenticatable  $user
      * @return string
      */
-    public function login(JWTSubject $user)
+    public function login($user): string
     {
         $this->validateMethodParam($user);
 
         $userPluginResolver = app(UserPluginResolver::class);
-        $token = $this->jwt->fromSubject($userPluginResolver->resolveModel());
+        $token = $this->jwt->fromSubject($userPluginResolver->resolveModel($user));
         $this->setToken($token)->setUser($user);
 
         return $token;

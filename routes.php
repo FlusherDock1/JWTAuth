@@ -2,10 +2,10 @@
 
 Route::group([
         'prefix' => 'jwt',
-        'namespace' => 'ReaZzon\\JWTAuth\\Http\\Controllers',
     ], static function () {
 
-    Route::post('login', 'AuthController');
-    Route::post('refresh', 'RefreshController');
-    Route::post('register', 'RegistrationController');
+    Route::post('login', \ReaZzon\JWTAuth\Http\Controllers\AuthController::class);
+    Route::post('refresh', \ReaZzon\JWTAuth\Http\Controllers\RefreshController::class);
+    Route::post('register', \ReaZzon\JWTAuth\Http\Controllers\RegistrationController::class);
+    Route::post('activate', \ReaZzon\JWTAuth\Http\Controllers\ActivationController::class);
 });

@@ -27,12 +27,21 @@ class TokenDto
     public User $user;
 
     /**
-     * @param ...$args
+     * @param $data
      */
-    public function __construct(...$args)
+    public function __construct($data)
     {
-        foreach($args as $name => $value) {
+        foreach($data as $name => $value) {
             $this->{$name} = $value;
         }
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'token' => $this->token,
+            'expires' => $this->expires,
+            'user' => $this->user
+        ];
     }
 }
