@@ -32,6 +32,16 @@ Route::group(['middleware' => [\ReaZzon\JWTAuth\Http\Middlewares\ResolveUser::cl
 });
 ```
 
+or 
+
+```php
+Route::post('account', function () {
+
+   // Logic that should be available only for authenticated users
+   
+})->middleware(\ReaZzon\JWTAuth\Http\Middlewares\ResolveUser::class);
+```
+
 ## Routes
 
 - **POST** `/jwt/login` - Login route
