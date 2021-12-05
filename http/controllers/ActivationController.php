@@ -33,6 +33,6 @@ class ActivationController extends Controller
             'user' => $user,
         ]);
 
-        return $tokenDto->toArray();
+        return ['data' => $tokenDto->toArray()];
     }
 }

@@ -12,6 +12,7 @@ use Model;
 interface Plugin
 {
     /**
+     * @param Model $model
      * @return JWTSubject
      */
     public function resolve(Model $model): JWTSubject;

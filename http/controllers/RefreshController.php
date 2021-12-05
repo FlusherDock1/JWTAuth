@@ -24,6 +24,7 @@ class RefreshController extends Controller
             'expires' => Argon::createFromTimestamp($this->JWTGuard->getPayload()->get('exp')),
             'user' => $this->JWTGuard->user(),
         ]);
-        return $tokenDto->toArray();
+
+        return ['data' => $tokenDto->toArray()];
     }
 }
