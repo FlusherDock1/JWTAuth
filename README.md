@@ -27,6 +27,13 @@ Route::group(['middleware' => [\ReaZzon\JWTAuth\Http\Middlewares\ResolveUser::cl
 });
 ```
 
+## Routes
+
+- **POST** `/jwt/login` - Login route
+- **POST** `/jwt/register` - Registration route
+- **POST** `/jwt/activate` - Activation route (if activation set to mail)
+- **POST** `/jwt/refresh` - Refresh route
+
 ## Suggestions, Ideas, Issues, Bugs
 
 
