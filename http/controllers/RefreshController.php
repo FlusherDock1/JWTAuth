@@ -5,7 +5,6 @@ namespace ReaZzon\JWTAuth\Http\Controllers;
 
 use October\Rain\Argon\Argon;
 use ReaZzon\JWTAuth\Classes\Dto\TokenDto;
-use ReaZzon\JWTAuth\Http\Resources\TokenResource;
 
 /**
  *
@@ -13,9 +12,9 @@ use ReaZzon\JWTAuth\Http\Resources\TokenResource;
 class RefreshController extends Controller
 {
     /**
-     * @return mixed
+     * @return array
      */
-    public function __invoke(): TokenResource
+    public function __invoke(): array
     {
         $tokenRefreshed = $this->JWTGuard->refresh(true);
         $this->JWTGuard->setToken($tokenRefreshed);
@@ -25,6 +24,6 @@ class RefreshController extends Controller
             'expires' => Argon::createFromTimestamp($this->JWTGuard->getPayload()->get('exp')),
             'user' => $this->JWTGuard->user(),
         ]);
-        return new TokenResource($tokenDto);
+        return $tokenDto->toArray();
     }
 }
