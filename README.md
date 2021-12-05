@@ -10,9 +10,14 @@ This plugin adds to your application functionality to authenticate with JWT toke
 
 ## Installation
 
-
+1. Install plugin via terminal in your enviroment:
 ```bash
 php artisan plugin:install ReaZzon.JWTAuth
+```
+
+2. Generate JWT Secret:
+```bash
+php artisan jwt:secret
 ```
 
 ## Middleware
