@@ -35,7 +35,7 @@ Route::group(['middleware' => [\ReaZzon\JWTAuth\Http\Middlewares\ResolveUser::cl
 or 
 
 ```php
-Route::post('account', function () {
+Route::get('account', function () {
 
    // Logic that should be available only for authenticated users
    
