@@ -6,7 +6,7 @@ namespace ReaZzon\JWTAuth\Classes\Resolvers;
 use RainLab\User\Models\User as RainlabUserModel;
 use ReaZzon\JWTAuth\Classes\Contracts\Plugin;
 use ReaZzon\JWTAuth\Classes\Exception\PluginModelResolverException;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Model;
 
 /**
@@ -27,6 +27,27 @@ final class RainlabPlugin implements Plugin
 
         $proxyObject = $this->proxyObject();
         return (new $proxyObject)->setRawAttributes($model->getAttributes());
+    }
+
+    public function initActivation($model): string
+    {
+        // TODO: Implement initActivation() method.
+    }
+
+    public function activateByCode($code)
+    {
+        // TODO: Implement activateByCode() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function registrationValidationExtend(): array
+    {
+        return [
+            'username' => 'sometimes|string',
+            'surname' => 'sometimes|string',
+        ];
     }
 
     /**

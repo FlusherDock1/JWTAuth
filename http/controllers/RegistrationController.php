@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace ReaZzon\JWTAuth\Http\Controllers;
 
+use ReaZzon\JWTAuth\Classes\Exceptions\Http\RegistrationErrorException;
 use ReaZzon\JWTAuth\Http\Requests\RegistrationRequest;
-use ReaZzon\JWTAuth\Http\Resources\TokenResource;
 
 /**
  *
@@ -23,7 +23,7 @@ class RegistrationController extends Controller
             ->register($registrationRequest->validated());
 
         if (empty($user)) {
-            throw new \ApplicationException('Registration failed');
+            throw new RegistrationErrorException();
         }
 
         if ($this->userPluginResolver->getResolver()->initActivation($user) !== 'on') {

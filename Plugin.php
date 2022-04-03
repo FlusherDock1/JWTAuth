@@ -20,13 +20,18 @@ use Lovata\Buddies\Models\User;
 use ReaZzon\JWTAuth\Classes\Events\UserModelHandler;
 
 use System\Classes\PluginManager;
-use Tymon\JWTAuth\Providers\LaravelServiceProvider;
+use PHPOpenSourceSaver\JWTAuth\Providers\LaravelServiceProvider;
 
 /**
  * JWTAuth Plugin Information File
  */
 class Plugin extends PluginBase
 {
+    /**
+     *
+     */
+    public const PLUGIN_NAME = 'ReaZzon.JWTAuth';
+
     /**
      * Returns information about this plugin.
      *
@@ -53,11 +58,9 @@ class Plugin extends PluginBase
 
         $this->app->singleton(
             UserPluginResolverContract::class,
-            static fn() => UserPluginResolver::instance()
+            static fn() => UserPluginResolver::instance(),
         );
 
-        $this->registerGates();
-        $this->registerJWT();
     }
 
     /**
@@ -67,6 +70,17 @@ class Plugin extends PluginBase
      */
     public function boot()
     {
+        if (!$this->getResolver()->isRequiredResolve()) {
+            PluginManager::instance()->disablePlugin(static::PLUGIN_NAME);
+            if (method_exists($this->getResolver(), 'forgetInstance')) {
+                $this->getResolver()::forgetInstance();
+            }
+
+            return;
+        }
+
+        $this->registerGates();
+        $this->registerJWT();
         $this->registerConfigs();
         $this->addEventListeners();
     }
@@ -105,7 +119,7 @@ class Plugin extends PluginBase
     /**
      *
      */
-    private function addEventListeners()
+    private function addEventListeners(): void
     {
         Event::subscribe(UserModelHandler::class);
     }
@@ -120,7 +134,7 @@ class Plugin extends PluginBase
 
         $this->app->singleton(GateContract::class, function ($app): Gate {
             return new Gate($app, function () use ($app): ?User {
-                return app(UserPluginResolverContract::class)->getProvider()->user();
+                return $this->getResolver()->getProvider()->user();
             });
         });
     }
@@ -132,10 +146,10 @@ class Plugin extends PluginBase
     {
         (new LaravelServiceProvider($this->app))->register();
 
-        $this->app->singleton('JWTGuard', static function ($app): Guard {
+        $this->app->singleton('JWTGuard', function ($app): Guard {
             $guard = new JWTGuard(
                 $app['tymon.jwt'],
-                new UserProvider(app(UserPluginResolverContract::class)->getModel()),
+                new UserProvider($this->getResolver()->getModel()),
                 $app['request']
             );
 
@@ -144,6 +158,9 @@ class Plugin extends PluginBase
         });
     }
 
+    /**
+     * @return array[]
+     */
     public function registerSettings(): array
     {
         return [
@@ -158,5 +175,13 @@ class Plugin extends PluginBase
                 'permissions' => ['buddies-menu-*']
             ]
         ];
+    }
+
+    /**
+     * @return UserPluginResolverContract
+     */
+    private function getResolver(): UserPluginResolverContract
+    {
+        return app(UserPluginResolverContract::class);
     }
 }

@@ -1,8 +1,7 @@
 <?php
 declare(strict_types=1);
-namespace ReaZzon\JWTAuth\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+namespace ReaZzon\JWTAuth\Http\Requests;
 
 /**
  *

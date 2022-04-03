@@ -3,10 +3,11 @@ declare(strict_types=1);
 
 namespace ReaZzon\JWTAuth\Classes;
 
-use Model;
+use PHPOpenSourceSaver\JWTAuth\JWTGuard;
 use ReaZzon\JWTAuth\Classes\Contracts\Plugin;
+use ReaZzon\JWTAuth\Classes\Dto\PluginDto;
 use System\Classes\PluginManager;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use October\Rain\Support\Traits\Singleton;
 use October\Rain\Auth\Manager as AuthManager;
 use ReaZzon\JWTAuth\Classes\Contracts\UserPluginResolver as UserPluginResolverContract;
@@ -18,7 +19,10 @@ final class UserPluginResolver implements UserPluginResolverContract
 {
     use Singleton;
 
-    private array $plugin;
+    /**
+     * @var PluginDto|null
+     */
+    private ?PluginDto $plugin = null;
 
     /**
      * Boot resolver
@@ -28,35 +32,33 @@ final class UserPluginResolver implements UserPluginResolverContract
      */
     public function init(): void
     {
-        $plugins = $this->getSupportPlugins();
-        foreach($plugins as $plugin) {
-            if (PluginManager::instance()->hasPlugin($plugin['name'])) {
-                $this->plugin = $plugin;
-                break;
+        $this->plugin = \Arr::first($this->getSupportPlugins(), static function (PluginDto $plugin): ?PluginDto {
+            if (!PluginManager::instance()->hasPlugin($plugin->name)) {
+                return null;
             }
-        }
 
-        if (empty($this->plugin)) {
-            throw new \SystemException('No required plugins found in system');
-        }
+            return $plugin;
+        });
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
     public function getModel(): string
     {
-        return $this->plugin['model'];
-    }
-
-    public function getResolver(): Plugin
-    {
-        return app($this->plugin['resolver']);
+        return $this->plugin->model;
     }
 
     /**
-     * @param $model
-     * @return JWTSubject
+     * @inheritDoc
+     */
+    public function getResolver(): Plugin
+    {
+        return app($this->plugin->resolver);
+    }
+
+    /**
+     * @inheritDoc
      */
     public function resolveModel($model): JWTSubject
     {
@@ -64,18 +66,37 @@ final class UserPluginResolver implements UserPluginResolverContract
     }
 
     /**
-     * @return AuthManager
+     * @inheritDoc
      */
     public function getProvider(): AuthManager
     {
-        return app($this->plugin['provider']);
+        return app($this->plugin->provider);
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
     public function getSupportPlugins(): array
     {
-        return config('reazzon.jwtauth::plugins');
+        return \array_map(
+            static fn(array $plugin) => new PluginDto($plugin),
+            config('reazzon.jwtauth::plugins')
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getGuard(): JWTGuard
+    {
+        return app('JWTGuard');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isRequiredResolve(): bool
+    {
+        return $this->plugin !== null;
     }
 }

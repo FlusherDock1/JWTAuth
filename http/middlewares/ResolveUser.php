@@ -2,11 +2,11 @@
 declare(strict_types=1);
 namespace ReaZzon\JWTAuth\Http\Middlewares;
 
-use ReaZzon\JWTAuth\Classes\Guards\JWTGuard;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\Exceptions\UserNotDefinedException;
-use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
-use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use ReaZzon\JWTAuth\Classes\Contracts\UserPluginResolver;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\UserNotDefinedException;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenBlacklistedException;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
 
 /**
  * Class ResolveUser
@@ -24,14 +24,14 @@ class ResolveUser
     public function handle($request, \Closure $next)
     {
         try {
-            /** @var JWTGuard $obJWTGuard */
-            $obJWTGuard = app('JWTGuard');
+            /** @var UserPluginResolver $userPluginResolver */
+            $userPluginResolver = app(UserPluginResolver::class);
 
-            if (!$obJWTGuard->hasToken()) {
+            if (!$userPluginResolver->getGuard()->hasToken()) {
                 abort('406', 'Token not provided');
             }
 
-            $obJWTGuard->userOrFail();
+            $userPluginResolver->getGuard()->userOrFail();
 
             return $next($request);
         } catch (TokenExpiredException|UserNotDefinedException $e) {

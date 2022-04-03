@@ -16,15 +16,15 @@ class RefreshController extends Controller
      */
     public function __invoke(): array
     {
-        $tokenRefreshed = $this->JWTGuard->refresh(true);
-        $this->JWTGuard->setToken($tokenRefreshed);
+        $tokenRefreshed = $this->userPluginResolver->getGuard()->refresh(true);
+        $this->userPluginResolver->getGuard()->setToken($tokenRefreshed);
 
         $tokenDto = new TokenDto([
             'token' => $tokenRefreshed,
-            'expires' => Argon::createFromTimestamp($this->JWTGuard->getPayload()->get('exp')),
-            'user' => $this->JWTGuard->user(),
+            'expires' => Argon::createFromTimestamp($this->userPluginResolver->getGuard()->getPayload()->get('exp')),
+            'user' => $this->userPluginResolver->getGuard()->user(),
         ]);
 
-        return ['data' => $tokenDto->toArray()];
+        return new TokenResource($tokenDto);
     }
 }

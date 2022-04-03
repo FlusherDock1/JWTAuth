@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace ReaZzon\JWTAuth\Http\Controllers;
 
 use October\Rain\Argon\Argon;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use ReaZzon\JWTAuth\Classes\Dto\TokenDto;
+use ReaZzon\JWTAuth\Classes\Exceptions\Http\PasswordWrongException;
 use ReaZzon\JWTAuth\Http\Requests\LoginRequest;
 use ReaZzon\JWTAuth\Http\Resources\TokenResource;
 
@@ -20,20 +22,21 @@ class AuthController extends Controller
      */
     public function __invoke(LoginRequest $loginRequest): array
     {
+        /** @var JWTSubject $user */
         $user = $this->userPluginResolver
             ->getProvider()
             ->authenticate($loginRequest->validated());
 
         if (empty($user)) {
-            throw new \ApplicationException('Login failed');
+            throw new PasswordWrongException();
         }
 
         $tokenDto = new TokenDto([
-            'token' => $this->JWTGuard->login($user),
-            'expires' => Argon::createFromTimestamp($this->JWTGuard->getPayload()->get('exp')),
+            'token' => $this->userPluginResolver->getGuard()->login($user),
+            'expires' => Argon::createFromTimestamp($this->userPluginResolver->getGuard()->getPayload()->get('exp')),
             'user' => $user,
         ]);
 
-        return ['data' => $tokenDto->toArray()];
+        return new TokenResource($tokenDto);
     }
 }

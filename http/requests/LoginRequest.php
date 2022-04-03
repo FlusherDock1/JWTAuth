@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace ReaZzon\JWTAuth\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use ReaZzon\JWTAuth\Classes\Contracts\UserPluginResolver;
 
 /**
  *
@@ -14,9 +14,18 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'email' => 'required|email',
+        return array_merge([
             'password' => 'required',
-        ];
+        ], $this->resolveLoginValidation());
+    }
+
+    /**
+     * @return array
+     */
+    protected function resolveLoginValidation(): array
+    {
+        /** @var UserPluginResolver $userPluginResolver */
+        $userPluginResolver = app(UserPluginResolver::class);
+        return $userPluginResolver->getResolver()->loginValidationExtend();
     }
 }
