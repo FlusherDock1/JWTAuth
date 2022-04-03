@@ -17,16 +17,10 @@ abstract class Controller
     protected UserPluginResolver $userPluginResolver;
 
     /**
-     * @var JWTGuard
-     */
-    protected JWTGuard $JWTGuard;
-
-    /**
      * @param UserPluginResolver $userPluginResolver
      */
     public function __construct(UserPluginResolver $userPluginResolver)
     {
         $this->userPluginResolver = $userPluginResolver;
-        $this->JWTGuard = app('JWTGuard');
     }
 }

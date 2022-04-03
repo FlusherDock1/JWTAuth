@@ -5,7 +5,9 @@ namespace ReaZzon\JWTAuth\Http\Controllers;
 
 use October\Rain\Argon\Argon;
 use ReaZzon\JWTAuth\Classes\Dto\TokenDto;
+use ReaZzon\JWTAuth\Classes\Exceptions\Http\ActivationCodeIncorrectException;
 use ReaZzon\JWTAuth\Http\Requests\ActivationRequest;
+use ReaZzon\JWTAuth\Http\Resources\TokenResource;
 
 /**
  *
@@ -17,22 +19,22 @@ class ActivationController extends Controller
      * @throws \ApplicationException
      * @return mixed
      */
-    public function __invoke(ActivationRequest $registrationRequest)
+    public function __invoke(ActivationRequest $registrationRequest): TokenResource
     {
         $user = $this->userPluginResolver
             ->getResolver()
             ->activateByCode($registrationRequest->validated());
 
         if (empty($user)) {
-            throw new \ApplicationException('Activation failed');
+            throw new ActivationCodeIncorrectException();
         }
 
         $tokenDto = new TokenDto([
-            'token' => $this->JWTGuard->login($user),
-            'expires' => Argon::createFromTimestamp($this->JWTGuard->getPayload()->get('exp')),
+            'token' => $this->userPluginResolver->getGuard()->login($user),
+            'expires' => Argon::createFromTimestamp($this->userPluginResolver->getGuard()->getPayload()->get('exp')),
             'user' => $user,
         ]);
 
-        return ['data' => $tokenDto->toArray()];
+        return new TokenResource($tokenDto);
     }
 }

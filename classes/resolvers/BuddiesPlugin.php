@@ -11,7 +11,7 @@ use Lovata\Toolbox\Classes\Helper\SendMailHelper;
 use Lovata\Toolbox\Models\Settings;
 use Lovata\Buddies\Models\User as BuddiesUserModel;
 use ReaZzon\JWTAuth\Models\BuddiesSettings;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use ReaZzon\JWTAuth\Classes\Contracts\Plugin;
 use ReaZzon\JWTAuth\Classes\Exception\PluginModelResolverException;
 
@@ -33,6 +33,92 @@ final class BuddiesPlugin implements Plugin
 
         $proxyObject = $this->proxyObject();
         return (new $proxyObject)->setRawAttributes($model->getAttributes());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function initActivation($user): string
+    {
+        $activationType = BuddiesSettings::get('activation_type', 'off');
+
+        switch ($activationType) {
+            case 'on':
+                $user->activation_code = $user->getActivationCode();
+                $user->is_activated = true;
+                break;
+
+            case 'off':
+                $user->activation_code = $user->getActivationCode();
+                $user->is_activated = false;
+                break;
+
+            case 'mail':
+                $user->activation_code = $user->getActivationCode();
+                $user->is_activated = false;
+
+                //Get mail data
+                $mailData = [
+                    'user'      => $user,
+                    'user_item' => UserItem::make($user->id, $this),
+                    'site_url'  => config('app.url'),
+                ];
+
+                $templateName = Settings::getValue('registration_mail_template', 'lovata.buddies::mail.registration');
+
+                $sendMailHelper = SendMailHelper::instance();
+                $sendMailHelper->send(
+                    $templateName,
+                    $user->email,
+                    $mailData,
+                    Registration::EMAIL_TEMPLATE_DATA_EVENT,
+                    true);
+
+                break;
+        }
+
+        $user->forceSave();
+
+        return $activationType;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function activateByCode($code)
+    {
+        $user = User::getByActivationCode($code)->first();
+        if (empty($user)) {
+            return null;
+        }
+
+        $user->activate();
+        $user->forceSave();
+
+        return $user;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function registrationValidationExtend(): array
+    {
+        return [
+            'email' => 'required|email',
+            'last_name' => 'sometimes|string',
+            'middle_name' => 'sometimes|string',
+            'phone' => 'sometimes|string',
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function loginValidationExtend(): array
+    {
+        return [
+            'email' => 'required|email',
+        ];
     }
 
     /**

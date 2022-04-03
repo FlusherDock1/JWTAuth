@@ -2,7 +2,8 @@
 declare(strict_types=1);
 namespace ReaZzon\JWTAuth\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+
+use ReaZzon\JWTAuth\Classes\Contracts\UserPluginResolver;
 
 /**
  *
@@ -14,14 +15,21 @@ class RegistrationRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        return array_merge([
             'name' => 'sometimes|string',
             'email' => 'sometimes|string',
-            'last_name' => 'sometimes|string',
-            'middle_name' => 'sometimes|string',
-            'phone' => 'sometimes|string',
             'password' => 'sometimes|confirmed',
             'password_confirmation' => 'required_with:password',
-        ];
+        ], $this->resolveLoginValidation());
+    }
+
+    /**
+     * @return array
+     */
+    protected function resolveRegistrationValidation(): array
+    {
+        /** @var UserPluginResolver $userPluginResolver */
+        $userPluginResolver = app(UserPluginResolver::class);
+        return $userPluginResolver->getResolver()->registrationValidationExtend();
     }
 }

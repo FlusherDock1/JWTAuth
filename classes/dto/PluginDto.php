@@ -10,20 +10,25 @@ use Spatie\DataTransferObject\DataTransferObject;
 /**
  *
  */
-final class TokenDto extends DataTransferObject
+final class PluginDto extends DataTransferObject
 {
     /**
      * @var string
      */
-    public string $token;
+    public string $name;
 
     /**
-     * @var Argon
+     * @var string
      */
-    public Argon $expires;
+    public string $model;
 
     /**
-     * @var User
+     * @var string
      */
-    public User $user;
+    public string $resolver;
+
+    /**
+     * @var string
+     */
+    public string $provider;
 }

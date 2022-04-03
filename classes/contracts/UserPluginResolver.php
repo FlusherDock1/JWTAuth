@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace ReaZzon\JWTAuth\Classes\Contracts;
 
 use October\Rain\Auth\Manager as AuthManager;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Model;
+use PHPOpenSourceSaver\JWTAuth\JWTGuard;
 
 /**
  *
@@ -17,6 +18,11 @@ interface UserPluginResolver
      */
     public function getModel(): string;
 
+    public function getResolver(): Plugin;
+
+    /**
+     * @return Plugin
+     */
     public function getResolver(): Plugin;
 
     /**
@@ -34,4 +40,14 @@ interface UserPluginResolver
      * @return array
      */
     public function getSupportPlugins(): array;
+
+    /**
+     * @return JWTGuard
+     */
+    public function getGuard(): JWTGuard;
+
+    /**
+     * @return bool
+     */
+    public function isRequiredResolve(): bool;
 }
