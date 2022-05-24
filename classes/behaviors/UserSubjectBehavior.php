@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace ReaZzon\JWTAuth\Classes\Behaviors;
 
 use October\Rain\Database\ModelBehavior;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 /**
  * Class UserSubjectBehavior

@@ -6,12 +6,12 @@
         "php": ">=7.4",
         "ext-json": "*",
         "composer/installers": "~1.0",
-        "tymon/jwt-auth": "1.0.2"
+        "php-open-source-saver/jwt-auth": "1.4.2"
     },
     "extra": {
         "laravel": {
             "dont-discover": [
-                "tymon/jwt-auth"
+                "php-open-source-saver/jwt-auth"
             ]
         }
     }

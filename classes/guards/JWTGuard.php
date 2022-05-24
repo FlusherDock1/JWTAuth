@@ -3,8 +3,8 @@
 use Illuminate\Contracts\Auth\Authenticatable;
 use October\Rain\Auth\Models\User;
 use ReaZzon\JWTAuth\Classes\Contracts\UserPluginResolver;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Tymon\JWTAuth\JWTGuard as JWTGuardBase;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\JWTGuard as JWTGuardBase;
 use ReaZzon\JWTAuth\Classes\Behaviors\UserSubjectBehavior;
 
 /**

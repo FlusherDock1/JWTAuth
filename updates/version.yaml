@@ -1,1 +1,2 @@
 1.0.1: First version of JWTAuth
+2.0.0: Migrate from tymon/jwt to PHP-Open-Source-Saver/jwt-auth. Support >=PHP8.0 and October CMS v3.

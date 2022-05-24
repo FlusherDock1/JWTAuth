@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace ReaZzon\JWTAuth\Classes\Contracts;
 
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Model;
 
 /**

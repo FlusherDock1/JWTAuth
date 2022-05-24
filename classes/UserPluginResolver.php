@@ -6,7 +6,7 @@ namespace ReaZzon\JWTAuth\Classes;
 use Model;
 use ReaZzon\JWTAuth\Classes\Contracts\Plugin;
 use System\Classes\PluginManager;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use October\Rain\Support\Traits\Singleton;
 use October\Rain\Auth\Manager as AuthManager;
 use ReaZzon\JWTAuth\Classes\Contracts\UserPluginResolver as UserPluginResolverContract;

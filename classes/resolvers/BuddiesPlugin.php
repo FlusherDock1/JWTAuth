@@ -11,7 +11,7 @@ use Lovata\Toolbox\Classes\Helper\SendMailHelper;
 use Lovata\Toolbox\Models\Settings;
 use Lovata\Buddies\Models\User as BuddiesUserModel;
 use ReaZzon\JWTAuth\Models\BuddiesSettings;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use ReaZzon\JWTAuth\Classes\Contracts\Plugin;
 use ReaZzon\JWTAuth\Classes\Exception\PluginModelResolverException;
 

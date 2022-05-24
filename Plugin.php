@@ -20,7 +20,7 @@ use Lovata\Buddies\Models\User;
 use ReaZzon\JWTAuth\Classes\Events\UserModelHandler;
 
 use System\Classes\PluginManager;
-use Tymon\JWTAuth\Providers\LaravelServiceProvider;
+use PHPOpenSourceSaver\JWTAuth\Providers\LaravelServiceProvider;
 
 /**
  * JWTAuth Plugin Information File
@@ -136,7 +136,8 @@ class Plugin extends PluginBase
             $guard = new JWTGuard(
                 $app['tymon.jwt'],
                 new UserProvider(app(UserPluginResolverContract::class)->getModel()),
-                $app['request']
+                $app['request'],
+                new \October\Rain\Events\Dispatcher()
             );
 
             $app->refresh('request', $guard, 'setRequest');

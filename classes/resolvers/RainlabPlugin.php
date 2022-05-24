@@ -6,7 +6,7 @@ namespace ReaZzon\JWTAuth\Classes\Resolvers;
 use RainLab\User\Models\User as RainlabUserModel;
 use ReaZzon\JWTAuth\Classes\Contracts\Plugin;
 use ReaZzon\JWTAuth\Classes\Exception\PluginModelResolverException;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Model;
 
 /**
