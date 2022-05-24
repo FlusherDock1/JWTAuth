@@ -3,10 +3,6 @@ declare(strict_types=1);
 namespace ReaZzon\JWTAuth\Http\Middlewares;
 
 use ReaZzon\JWTAuth\Classes\Guards\JWTGuard;
-use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
-use PHPOpenSourceSaver\JWTAuth\Exceptions\UserNotDefinedException;
-use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenBlacklistedException;
-use PHPOpenSourceSaver\JWTAuth\Exceptions\TokenExpiredException;
 
 /**
  * Class SoftResolveUser
@@ -24,7 +20,7 @@ class SoftResolveUser
     public function handle($obRequest, \Closure $next)
     {
         try {
-            /** @var \BizMark\Gateway\JWT\JWTGuard $obJWTGuard */
+            /** @var JWTGuard $obJWTGuard */
             $obJWTGuard = app('JWTGuard');
             $obJWTGuard->user();
         } catch (\Exception $ex) {}
