@@ -6,6 +6,8 @@ namespace ReaZzon\JWTAuth\Http\Requests;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Foundation\Http\FormRequest as BaseFormRequest;
 use October\Rain\Extension\ExtendableTrait;
+use ReaZzon\JWTAuth\Classes\Exceptions\ValidationException;
+use Illuminate\Contracts\Validation\Validator;
 
 /**
  * Class FormRequest.
@@ -15,8 +17,17 @@ abstract class FormRequest extends BaseFormRequest
 {
     use ExtendableTrait;
 
+    /**
+     *
+     */
     private const EXTEND_RULES_METHOD = 'extendRules';
+    /**
+     *
+     */
     private const EXTEND_MESSAGES_METHOD = 'extendMessages';
+    /**
+     *
+     */
     private const EXTEND_ATTRIBUTES_METHOD = 'extendAttributes';
 
     /**
@@ -64,5 +75,15 @@ abstract class FormRequest extends BaseFormRequest
     {
         return $this->methodExists($name) ?
             $this->extendableCall($name) : [];
+    }
+
+    /**
+     * @param Validator $validator
+     * @return void
+     * @throws ValidationException
+     */
+    protected function failedValidation(Validator $validator)
+    {
+        throw new ValidationException($validator);
     }
 }

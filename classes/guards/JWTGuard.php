@@ -1,4 +1,7 @@
-<?php namespace ReaZzon\JWTAuth\Classes\Guards;
+<?php
+declare(strict_types=1);
+
+namespace ReaZzon\JWTAuth\Classes\Guards;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use October\Rain\Auth\Models\User;
@@ -33,6 +36,14 @@ class JWTGuard extends JWTGuardBase
     public function hasToken(): bool
     {
         return $this->jwt->parser()->setRequest($this->getRequest())->hasToken();
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCurrentToken(): ?string
+    {
+        return $this->jwt->getToken();
     }
 
     /**

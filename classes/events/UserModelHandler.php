@@ -1,10 +1,14 @@
-<?php namespace ReaZzon\JWTAuth\Classes\Events;
+<?php
+declare(strict_types=1);
+
+namespace ReaZzon\JWTAuth\Classes\Events;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use October\Rain\Database\Model;
 use ReaZzon\JWTAuth\Classes\Contracts\UserPluginResolver;
 use ReaZzon\JWTAuth\Classes\Behaviors\UserSubjectBehavior;
 
-class UserModelHandler
+final class UserModelHandler
 {
     /**
      * Add listeners
@@ -14,7 +18,8 @@ class UserModelHandler
     {
         $model = app(UserPluginResolver::class)->getModel();
         $model::extend(static function (Authenticatable $userModel) {
-            $userModel->implement[] = UserSubjectBehavior::class;
+            /** @var Authenticatable|Model $userModel */
+            $userModel->implementClassWith(UserSubjectBehavior::class);
         });
     }
 }

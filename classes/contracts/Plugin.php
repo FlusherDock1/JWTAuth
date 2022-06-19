@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace ReaZzon\JWTAuth\Classes\Contracts;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Model;
 
@@ -18,16 +19,16 @@ interface Plugin
     public function resolve(Model $model): JWTSubject;
 
     /**
-     * @param $model
-     * @return string
+     * @param Model $user
+     * @return Model
      */
-    public function initActivation($model): string;
+    public function initActivation(Model $user): Model;
 
     /**
-     * @param $code
-     * @return mixed
+     * @param string $code
+     * @return Model
      */
-    public function activateByCode($code);
+    public function activateByCode(string $code): Model;
 
     /**
      * @return array
@@ -38,8 +39,4 @@ interface Plugin
      * @return array
      */
     public function loginValidationExtend(): array;
-  
-    public function initActivation($model): string;
-
-    public function activateByCode($code);
 }

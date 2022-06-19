@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace ReaZzon\JWTAuth;
 
 use Event, Config;
+use Illuminate\Contracts\Events\Dispatcher;
 use System\Classes\PluginBase;
 use ReaZzon\JWTAuth\Classes\UserPluginResolver;
 use ReaZzon\JWTAuth\Classes\Contracts\UserPluginResolver as UserPluginResolverContract;
@@ -33,6 +34,16 @@ class Plugin extends PluginBase
     public const PLUGIN_NAME = 'ReaZzon.JWTAuth';
 
     /**
+     * @var bool|null
+     */
+    private $registered = null;
+
+    /**
+     * @var string[]
+     */
+    public $require = ['RainLab.User'];
+
+    /**
      * Returns information about this plugin.
      *
      * @return array
@@ -54,13 +65,10 @@ class Plugin extends PluginBase
      */
     public function register()
     {
-        $this->checkRequiredPlugins();
-
         $this->app->singleton(
             UserPluginResolverContract::class,
             static fn() => UserPluginResolver::instance(),
         );
-
     }
 
     /**
@@ -70,34 +78,11 @@ class Plugin extends PluginBase
      */
     public function boot()
     {
-        if (!$this->getResolver()->isRequiredResolve()) {
-            PluginManager::instance()->disablePlugin(static::PLUGIN_NAME);
-            if (method_exists($this->getResolver(), 'forgetInstance')) {
-                $this->getResolver()::forgetInstance();
-            }
-
-            return;
-        }
-
-        $this->registerGates();
-        $this->registerJWT();
-        $this->registerConfigs();
-        $this->addEventListeners();
-    }
-
-    protected function checkRequiredPlugins()
-    {
-        $plugins = ['RainLab.User', 'Lovata.Buddies'];
-        $pluginInstalled = false;
-
-        foreach ($plugins as $pluginName) {
-            if (PluginManager::instance()->hasPlugin($pluginName)) {
-                $pluginInstalled = true;
-            }
-        }
-
-        if (!$pluginInstalled) {
-            PluginManager::instance()->disablePlugin('ReaZzon.JWTAuth');
+        if ($this->isRegistered()) {
+            $this->registerJWT();
+            $this->registerGates();
+            $this->registerConfigs();
+            $this->addEventListeners();
         }
     }
 
@@ -150,7 +135,8 @@ class Plugin extends PluginBase
             $guard = new JWTGuard(
                 $app['tymon.jwt'],
                 new UserProvider($this->getResolver()->getModel()),
-                $app['request']
+                $app['request'],
+                app(Dispatcher::class)
             );
 
             $app->refresh('request', $guard, 'setRequest');
@@ -183,5 +169,34 @@ class Plugin extends PluginBase
     private function getResolver(): UserPluginResolverContract
     {
         return app(UserPluginResolverContract::class);
+    }
+
+    /**
+     * @return bool
+     */
+    private function isRegistered(): bool
+    {
+        if ($this->registered === null) {
+            $this->registered = $this->getResolver()->isRequiredResolve();
+            $this->disablePlugin();
+        }
+
+        return $this->registered;
+    }
+
+    /**
+     * @return void
+     */
+    private function disablePlugin(): void
+    {
+        if ($this->registered === true) {
+            return;
+        }
+
+        PluginManager::instance()->disablePlugin(static::PLUGIN_NAME);
+
+        if (method_exists($this->getResolver(), 'forgetInstance')) {
+            $this->getResolver()::forgetInstance();
+        }
     }
 }

@@ -18,8 +18,6 @@ interface UserPluginResolver
      */
     public function getModel(): string;
 
-    public function getResolver(): Plugin;
-
     /**
      * @return Plugin
      */

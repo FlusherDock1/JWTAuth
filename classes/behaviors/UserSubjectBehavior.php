@@ -2,6 +2,8 @@
 declare(strict_types=1);
 namespace ReaZzon\JWTAuth\Classes\Behaviors;
 
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use October\Rain\Database\ModelBehavior;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
@@ -11,12 +13,15 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
  */
 class UserSubjectBehavior extends ModelBehavior implements JWTSubject
 {
+    /** @var Authenticatable|Model */
+    protected $model;
+
     /**
      * @return mixed
      */
     public function getJWTIdentifier()
     {
-        return $this->model->getKey();
+        return $this->model->getAuthIdentifier();
     }
 
     /**

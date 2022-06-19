@@ -3,38 +3,29 @@ declare(strict_types=1);
 
 namespace ReaZzon\JWTAuth\Classes\Resolvers;
 
+use RainLab\User\Models\Settings as UserSettings;
 use RainLab\User\Models\User as RainlabUserModel;
 use ReaZzon\JWTAuth\Classes\Contracts\Plugin;
 use ReaZzon\JWTAuth\Classes\Exception\PluginModelResolverException;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Model;
+use ReaZzon\JWTAuth\Classes\Traits\BasePluginResolver;
 
 /**
  *
  */
 final class RainlabPlugin implements Plugin
 {
-    /**
-     * @param Model $model
-     * @return JWTSubject
-     * @throws PluginModelResolverException
-     */
-    public function resolve(Model $model): JWTSubject
-    {
-        if (!$model instanceof RainlabUserModel) {
-            throw new PluginModelResolverException;
-        }
+    use BasePluginResolver;
 
-        $proxyObject = $this->proxyObject();
-        return (new $proxyObject)->setRawAttributes($model->getAttributes());
+    protected const MODEL = RainlabUserModel::class;
+
+    public function initActivation(Model $user): Model
+    {
+
     }
 
-    public function initActivation($model): string
-    {
-        // TODO: Implement initActivation() method.
-    }
-
-    public function activateByCode($code)
+    public function activateByCode($code): Model
     {
         // TODO: Implement activateByCode() method.
     }
@@ -51,9 +42,17 @@ final class RainlabPlugin implements Plugin
     }
 
     /**
-     * @return RainlabUserModel|JWTSubject
+     * @inheritDoc
      */
-    private function proxyObject()
+    public function loginValidationExtend(): array
+    {
+        return [];
+    }
+
+    /**
+     * @return JWTSubject
+     */
+    protected function proxyObject(): JWTSubject
     {
         return new class extends RainlabUserModel implements JWTSubject {
             public $exists = true;
@@ -70,18 +69,8 @@ final class RainlabPlugin implements Plugin
 
             public function afterRegistrationActivate()
             {
-                return 'on';
+                return UserSettings::get('activate_mode') === UserSettings::ACTIVATE_AUTO;
             }
         };
-    }
-
-    public function initActivation($model): string
-    {
-        // TODO: Implement initActivation() method.
-    }
-
-    public function activateByCode($code)
-    {
-        // TODO: Implement activateByCode() method.
     }
 }

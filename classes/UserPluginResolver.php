@@ -32,12 +32,8 @@ final class UserPluginResolver implements UserPluginResolverContract
      */
     public function init(): void
     {
-        $this->plugin = \Arr::first($this->getSupportPlugins(), static function (PluginDto $plugin): ?PluginDto {
-            if (!PluginManager::instance()->hasPlugin($plugin->name)) {
-                return null;
-            }
-
-            return $plugin;
+        $this->plugin = \Arr::first($this->getSupportPlugins(), static function (PluginDto $plugin): bool {
+            return PluginManager::instance()->hasPlugin($plugin->name);
         });
     }
 

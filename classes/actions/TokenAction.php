@@ -1,15 +1,17 @@
 <?php
 declare(strict_types=1);
 
-namespace ReaZzon\JWTAuth\Http\Controllers;
+namespace ReaZzon\JWTAuth\Classes\Actions;
 
+use October\Rain\Argon\Argon;
 use ReaZzon\JWTAuth\Classes\Contracts\UserPluginResolver;
-use ReaZzon\JWTAuth\Classes\Guards\JWTGuard;
+use ReaZzon\JWTAuth\Classes\Dto\TokenDto;
 
 /**
- * Base JWTAuth Controller
+ * Class TokenAction.
+ * @package ReaZzon\JWTAuth\Classes\Actions
  */
-abstract class Controller
+abstract class TokenAction
 {
     /**
      * @var UserPluginResolver
@@ -17,17 +19,10 @@ abstract class Controller
     protected UserPluginResolver $userPluginResolver;
 
     /**
-     * @var JWTGuard|\PHPOpenSourceSaver\JWTAuth\JWTGuard|null
-     * @deprecated use $this->userPluginResolver->getGuard()
-     */
-    protected ?JWTGuard $JWTGuard = null;
-
-    /**
      * @param UserPluginResolver $userPluginResolver
      */
     public function __construct(UserPluginResolver $userPluginResolver)
     {
         $this->userPluginResolver = $userPluginResolver;
-        $this->JWTGuard = $this->userPluginResolver->getGuard();
     }
 }

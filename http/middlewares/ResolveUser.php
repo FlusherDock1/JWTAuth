@@ -32,7 +32,6 @@ class ResolveUser
             }
 
             $userPluginResolver->getGuard()->userOrFail();
-
             return $next($request);
         } catch (TokenExpiredException|UserNotDefinedException $e) {
             abort(406, 'Token is expired');

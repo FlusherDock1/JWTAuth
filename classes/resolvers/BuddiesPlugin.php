@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace ReaZzon\JWTAuth\Classes\Resolvers;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Model;
 use Lovata\Buddies\Models\User;
 use Lovata\Buddies\Classes\Item\UserItem;
@@ -10,6 +11,7 @@ use Lovata\Buddies\Components\Registration;
 use Lovata\Toolbox\Classes\Helper\SendMailHelper;
 use Lovata\Toolbox\Models\Settings;
 use Lovata\Buddies\Models\User as BuddiesUserModel;
+use ReaZzon\JWTAuth\Classes\Traits\BasePluginResolver;
 use ReaZzon\JWTAuth\Models\BuddiesSettings;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use ReaZzon\JWTAuth\Classes\Contracts\Plugin;
@@ -20,72 +22,31 @@ use ReaZzon\JWTAuth\Classes\Exception\PluginModelResolverException;
  */
 final class BuddiesPlugin implements Plugin
 {
-    /**
-     * @param Model $model
-     * @return JWTSubject
-     * @throws PluginModelResolverException
-     */
-    public function resolve($model): JWTSubject
-    {
-        if (!$model instanceof BuddiesUserModel) {
-            throw new PluginModelResolverException;
-        }
+    use BasePluginResolve;
 
-        $proxyObject = $this->proxyObject();
-        return (new $proxyObject)->setRawAttributes($model->getAttributes());
-    }
+    protected const MODEL = BuddiesUserModel::class;
 
     /**
      * @inheritDoc
      */
-    public function initActivation($user): string
+    public function initActivation(Model $user): Model
     {
         $activationType = BuddiesSettings::get('activation_type', 'off');
 
-        switch ($activationType) {
-            case 'on':
-                $user->activation_code = $user->getActivationCode();
-                $user->is_activated = true;
-                break;
+        $user->is_activated = ($activationType === 'on');
+        $user->getActivationCode();
 
-            case 'off':
-                $user->activation_code = $user->getActivationCode();
-                $user->is_activated = false;
-                break;
-
-            case 'mail':
-                $user->activation_code = $user->getActivationCode();
-                $user->is_activated = false;
-
-                //Get mail data
-                $mailData = [
-                    'user'      => $user,
-                    'user_item' => UserItem::make($user->id, $this),
-                    'site_url'  => config('app.url'),
-                ];
-
-                $templateName = Settings::getValue('registration_mail_template', 'lovata.buddies::mail.registration');
-
-                $sendMailHelper = SendMailHelper::instance();
-                $sendMailHelper->send(
-                    $templateName,
-                    $user->email,
-                    $mailData,
-                    Registration::EMAIL_TEMPLATE_DATA_EVENT,
-                    true);
-
-                break;
+        if ($activationType === 'mail') {
+            $this->notifcationMail($user);
         }
 
-        $user->forceSave();
-
-        return $activationType;
+        return $user;
     }
 
     /**
      * @inheritDoc
      */
-    public function activateByCode($code)
+    public function activateByCode(string $code): ?Model
     {
         $user = User::getByActivationCode($code)->first();
         if (empty($user)) {
@@ -122,9 +83,9 @@ final class BuddiesPlugin implements Plugin
     }
 
     /**
-     * @return BuddiesUserModel|JWTSubject
+     * @return JWTSubject
      */
-    private function proxyObject()
+    protected function proxyObject(): JWTSubject
     {
         return new class extends BuddiesUserModel implements JWTSubject {
             public $exists = true;
@@ -142,63 +103,25 @@ final class BuddiesPlugin implements Plugin
     }
 
     /**
-     * @param User $user
-     * @return string
+     * @param Model $user
+     * @return void
      */
-    public function initActivation($user): string
+    private function notificationMail(Model $user): void
     {
-        $activationType = BuddiesSettings::get('activation_type', 'off');
+        //Get mail data
+        $mailData = [
+            'user'      => $user,
+            'user_item' => UserItem::make($user->getKey(), $this),
+            'site_url'  => config('app.url'),
+        ];
 
-        switch ($activationType) {
-            case 'on':
-                $user->activation_code = $user->getActivationCode();
-                $user->is_activated = true;
-                break;
+        $templateName = Settings::getValue('registration_mail_template', 'lovata.buddies::mail.registration');
 
-            case 'off':
-                $user->activation_code = $user->getActivationCode();
-                $user->is_activated = false;
-                break;
-
-            case 'mail':
-                $user->activation_code = $user->getActivationCode();
-                $user->is_activated = false;
-
-                //Get mail data
-                $mailData = [
-                    'user'      => $user,
-                    'user_item' => UserItem::make($user->id, $this),
-                    'site_url'  => config('app.url'),
-                ];
-
-                $templateName = Settings::getValue('registration_mail_template', 'lovata.buddies::mail.registration');
-
-                $sendMailHelper = SendMailHelper::instance();
-                $sendMailHelper->send(
-                    $templateName,
-                    $user->email,
-                    $mailData,
-                    Registration::EMAIL_TEMPLATE_DATA_EVENT,
-                    true);
-
-                break;
-        }
-
-        $user->forceSave();
-
-        return $activationType;
-    }
-
-    public function activateByCode($code)
-    {
-        $user = User::getByActivationCode($code)->first();
-        if (empty($user)) {
-            return null;
-        }
-
-        $user->activate();
-        $user->forceSave();
-
-        return $user;
+        SendMailHelper::instance()->send(
+            $templateName,
+            $user->email,
+            $mailData,
+            Registration::EMAIL_TEMPLATE_DATA_EVENT,
+            true);
     }
 }
