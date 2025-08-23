@@ -1,3 +1,4 @@
 1.0.1: First version of JWTAuth
 2.0.0: Migrate from tymon/jwt to PHP-Open-Source-Saver/jwt-auth. Support >=PHP8.0 and October CMS v3.
 2.0.1: Added middleware with soft user resolver that will not throw exception if token not provided.
+2.0.2: Update PHP-Open-Source-Saver/jwt-auth to ^2.4.0 and PHP to ^8.1
